@@ -1,0 +1,18 @@
+# Exclude Gradle build files
+.gradle/
+build/
+
+# Exclude IntelliJ IDEA project files
+.idea/
+
+# Exclude compiled Java classes
+*.class
+
+# Exclude temporary files
+*.lock
+*.bin
+
+# Exclude specific directories within build/tmp
+build/tmp/compileJava/
+build/tmp/jar/
+
