@@ -1,6 +1,6 @@
 # Exclude Gradle build files
-.gradle/
-build/
+kafka-basics/.gradle/
+kafka-basics/build/
 
 # Exclude IntelliJ IDEA project files
 .idea/
