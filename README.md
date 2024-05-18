@@ -10,7 +10,7 @@ Steps To Connect To Kafka:
 
 3. kafka-topics.sh --bootstrap-server localhost:9092 --topic first_topic --create --partitions 3 --replication-factor 1
 
-Steps 1,2,3 help us to start server and create a topic with name as "first_topic"
+Steps 1,2,3 help us to start kafka server and create a topic with name as "first_topic"
 
 Below are some useful commands to check topic details and start the consumer and see the consumed messages: 
 
