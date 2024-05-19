@@ -2,6 +2,9 @@
 kafka-spring-boot/kafka-basics/.gradle/
 kafka-spring-boot/kafka-basics/build/
 
+wikimedia-project/.gradle/
+wikimedia-project/build/
+
 # Exclude IntelliJ IDEA project files
 .idea/
 
