@@ -5,6 +5,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,21 +29,44 @@ public class ConsumerDemoWithShutdown {
         properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "my-java-application");
         properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
-
         //Create Producer
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
 
-        //subscribe to the topic
-        consumer.subscribe(List.of("demo_topic"));
+        final Thread mainThread = Thread.currentThread();
 
-        // poll for data
-        while(true) {
-            log.info("Polling");
-
-            ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofMillis(1000));
-            for(ConsumerRecord<String, String> consumerRecord: consumerRecords) {
-                System.out.println(consumerRecord.value());
+        Runtime.getRuntime().addShutdownHook(new Thread(){
+            public void run() {
+                log.info("Detected a shutdown");
+                consumer.wakeup();
+                try {
+                    mainThread.join();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
+        });
+
+
+        try {
+            //subscribe to the topic
+            consumer.subscribe(List.of("demo_topic"));
+
+            // poll for data
+            while (true) {
+                log.info("Polling");
+
+                ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofMillis(1000));
+                for (ConsumerRecord<String, String> consumerRecord : consumerRecords) {
+                    System.out.println(consumerRecord.value());
+                }
+            }
+        }catch(WakeupException e) {
+            log.error("WakeupException");
+        }catch(Exception e) {
+            log.error("Errorrr", e);
+        }finally {
+            consumer.close();
+            log.info(("Consumer is closed gracefully"));
         }
     }
 }
