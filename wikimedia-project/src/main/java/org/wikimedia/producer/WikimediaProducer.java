@@ -63,6 +63,7 @@ public class WikimediaProducer {
 //        properties.setProperty(ProducerConfig.ACKS_CONFIG, "all");
 //        properties.setProperty(ProducerConfig.RETRIES_CONFIG, Integer.toString(Integer.MAX_VALUE));
         properties.setProperty(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, "5");
+        properties.setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG, "lz4");
 //        properties.setProperty(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, "12000");
         return properties;
     }
