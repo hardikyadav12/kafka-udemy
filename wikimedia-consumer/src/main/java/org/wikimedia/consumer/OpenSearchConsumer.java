@@ -99,9 +99,14 @@ public class OpenSearchConsumer {
                 log.info("Received: " + record + " records");
 
                 for (ConsumerRecord<String, String> consumerRecord : consumerRecords) {
+
+                    //strategy 1 for not sending duplicate records
+                    String id = consumerRecord.topic() + "_"  + consumerRecord.partition() + "_" + consumerRecord.offset();
+
                     try {
                         IndexRequest indexRequest = new IndexRequest("wikimedia")
-                                .source(consumerRecord.value(), XContentType.JSON);
+                                .source(consumerRecord.value(), XContentType.JSON)
+                                .id(id);
 
                         IndexResponse indexResponse = openSearchClient.index(indexRequest, RequestOptions.DEFAULT);
                         log.info("ID for response: " + indexResponse.getId());
