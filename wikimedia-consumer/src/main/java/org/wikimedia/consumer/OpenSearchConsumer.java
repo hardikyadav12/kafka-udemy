@@ -1,5 +1,7 @@
 package org.wikimedia.consumer;
 
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -99,11 +101,12 @@ public class OpenSearchConsumer {
                 log.info("Received: " + record + " records");
 
                 for (ConsumerRecord<String, String> consumerRecord : consumerRecords) {
-
                     //strategy 1 for not sending duplicate records
-                    String id = consumerRecord.topic() + "_"  + consumerRecord.partition() + "_" + consumerRecord.offset();
+//                    String id = consumerRecord.topic() + "_"  + consumerRecord.partition() + "_" + consumerRecord.offset();
 
                     try {
+                        //Strategy 2 - we get id from the request body and send it in the index for id field
+                        String id = extractId(consumerRecord.value());
                         IndexRequest indexRequest = new IndexRequest("wikimedia")
                                 .source(consumerRecord.value(), XContentType.JSON)
                                 .id(id);
@@ -116,6 +119,17 @@ public class OpenSearchConsumer {
                 }
             }
         }
+
+    }
+
+    private static String extractId(String jsonValue) {
+
+        return JsonParser.parseString(jsonValue)
+                .getAsJsonObject()
+                .get("meta")
+                .getAsJsonObject()
+                .get("id")
+                .getAsString();
 
     }
 }
